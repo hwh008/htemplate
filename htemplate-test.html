@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>h-tmpl模板引擎测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-case {
+            border: 1px solid #eb1818;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+            margin-top: 0;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .result {
+            margin-top: 20px;
+            border-top: 1px dashed #2629df;
+            padding-top: 20px;
+        }
+        #expandButton {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        #expandButton:hover {
+            background-color: #45a049;
+        }
+        #expandButton:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>h-tmpl模板引擎测试</h1>
+    <button id="expandButton">展开模板</button>
+
+    <!-- 定义模板 -->
+    <template id="BasicTemplate">
+        <div class="basic-template result">
+            <h2 h-slot="h2"></h2>
+            <p>组件</p><div class="content" h-slot=".content"></div>
+        </div>
+    </template>
+
+    <template id="CardTemplate">
+        <div class="card result">
+            <div class="card-header" style="background-color: #f0f0f0;" h-slot=".card-header"></div>
+            <div class="card-body" h-slot=".card-body"></div>
+            <div class="card-footer" h-slot=".card-footer"></div>
+        </div>
+    </template>
+
+    <template id="ListTemplate">
+        <ul class="list result">
+            <li h-slot="li"></li>
+        </ul>
+    </template>
+
+    <template id="NestedTemplate">
+        <div class="nested-container result">
+            <h3 h-slot="h3"></h3>
+            <p>下一层</p>
+            <div class="nested-content" h-slot=".nested-content"></div>
+        </div>
+    </template>
+
+    <!-- 新增模板：内部包含h-tmpl属性 -->
+    <template id="TemplateWithNestedTmpl">
+        <div class="template-with-nested-tmpl result">
+            <h2 h-slot="title"></h2>
+            <div class="nested-tmpl-section">
+                <div h-tmpl="BasicTemplate" h-slot=".nested-tmpl-content"></div>
+            </div>
+        </div>
+    </template>
+
+    <iframe id="componentsFrame" h-import src="_components.html" style="display: none;"></iframe>
+
+
+    <!-- 测试案例1: 基本使用 -->
+    <div class="test-case">
+        <h2>测试案例1: 基本使用</h2>
+        <div h-tmpl="BasicTemplate" ext="abc">
+            <h2>基本模板测试</h2>
+            <div class="content">这是一个基本的模板测试案例。</div>
+        </div>
+    </div>
+
+    <!-- 测试案例2: 带属性的模板 -->
+    <div class="test-case">
+        <h2>测试案例2: 带属性的模板</h2>
+        <div h-tmpl="CardTemplate2">
+            <div class="card-header" >卡片标题</div>
+            <div class="card-body">卡片内容区域</div>
+            <div class="card-footer">卡片页脚 - 包含一些额外信息</div>
+        </div>
+    </div>
+
+    <!-- 测试案例3: 嵌套模板 -->
+    <div class="test-case">
+        <h2>测试案例3: 嵌套模板</h2>
+        <div h-tmpl="BasicTemplate">
+            <h2>嵌套模板测试</h2>
+            <div class="content">
+                <div h-tmpl="CardTemplate">
+                    <div class="card-header">嵌套卡片标题</div>
+                    <div class="card-body">
+                        <div h-tmpl="ListTemplate">
+                            <li>嵌套列表项 1</li>
+                            <li>嵌套列表项 2</li>
+                            <li>嵌套列表项 3</li>
+                        </div>
+                    </div>
+                    <div class="card-footer">嵌套卡片页脚</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 测试案例4: 多层嵌套 -->
+    <div class="test-case">
+        <h2>测试案例4: 多层嵌套</h2>
+        <div h-tmpl="NestedTemplate">
+            <h3>第一层嵌套</h3>
+            <div class="nested-content">
+                <div h-tmpl="NestedTemplate">
+                    <h3>第二层嵌套</h3>
+                    <div class="nested-content">
+                        <div h-tmpl="NestedTemplate">
+                            <h3>第三层嵌套</h3>
+                            <div class="nested-content">
+                                这是最内层的内容
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 测试案例5: 模板内部包含h-tmpl属性 -->
+    <div class="test-case">
+        <h2>测试案例5: 模板内部包含h-tmpl属性</h2>
+        <div h-tmpl="TemplateWithNestedTmpl">
+            <h2>模板内部嵌套测试</h2>
+            <div class="nested-tmpl-content">
+                <h2>嵌套的BasicTemplate标题</h2>
+                <div class="content">这是嵌套在TemplateWithNestedTmpl中的BasicTemplate内容。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入模板引擎脚本 -->
+    <script src="js/htemplate.js?export=1"></script>
+
+    <!-- 测试脚本 -->
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加按钮点击事件
+            document.getElementById('expandButton').addEventListener('click', function() {
+                // 调用expandTemplates函数展开所有模板
+                expandTemplates(document);
+                // 禁用按钮，防止重复点击
+                this.disabled = true;
+                this.textContent = '已展开模板';
+            });
+        });
+    </script>
+</body>
+</html>
